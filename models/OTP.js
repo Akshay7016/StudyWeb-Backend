@@ -19,11 +19,7 @@ const OTPSchema = new mongoose.Schema({
 });
 
 const sendVerificationMail = async (email, otp) => {
-    try {
-        await mailSender(email, "Verification mail from StudyWeb", otp)
-    } catch (error) {
-        console.log("Error occur while sending mail: ", error.message);
-    }
+    await mailSender(email, "Verification mail from StudyWeb", otp)
 };
 
 // pre middleware
