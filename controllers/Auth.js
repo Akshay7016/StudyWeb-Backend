@@ -7,6 +7,8 @@ const User = require("../models/User");
 const OTP = require("../models/OTP");
 const Profile = require("../models/Profile");
 
+const mailSender = require("../utils/mailSender");
+
 // sendOTP
 exports.sendOTP = async (req, res) => {
     try {
@@ -59,7 +61,7 @@ exports.sendOTP = async (req, res) => {
             message: "Something went wrong while sending otp"
         })
     }
-}
+};
 
 // signUp
 exports.signUp = async (req, res) => {
@@ -104,6 +106,7 @@ exports.signUp = async (req, res) => {
             })
         }
 
+        // check otp present in database and otp entered by user are same
         if (recentOtp.otp !== otp) {
             return res.status(400).json({
                 success: false,
@@ -145,7 +148,7 @@ exports.signUp = async (req, res) => {
             message: "User cannot be registered. Please try again."
         })
     }
-}
+};
 
 // logIn
 exports.login = async (req, res) => {
@@ -210,6 +213,51 @@ exports.login = async (req, res) => {
             message: "Log in failure, Please try again!"
         })
     }
-}
+};
 
 // changePassword
+exports.changePassword = async (req, res) => {
+    try {
+        const { email } = req.user;
+        const { newPassword, confirmNewPassword } = req.body;
+
+        // validation
+        if (!newPassword || !confirmNewPassword) {
+            return res.send(403).json({
+                success: false,
+                message: "All fields are required, Please try again!"
+            })
+        };
+
+        // check newPassword and confirmNewPassword are same or not
+        if (newPassword !== confirmNewPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "newPassword and confirmNewPassword must be same, please try again!"
+            })
+        };
+
+        // Hashed password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // update password in database
+        await User.findOneAndUpdate({ email }, { password: hashedPassword });
+
+        // send mail - password updated
+        const title = "Password change request";
+        const mailBody = "Your StudyWeb account password has been updated successfully!";
+
+        await mailSender(email, title, mailBody);
+
+        // return response
+        return res.status(200).json({
+            success: true,
+            message: "Password updated successfully!"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while updating account password"
+        })
+    }
+};
