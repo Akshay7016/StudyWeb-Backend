@@ -1,5 +1,7 @@
+require("dotenv").config();
 const otpGenerator = require("otp-generator");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
 const OTP = require("../models/OTP");
@@ -54,7 +56,7 @@ exports.sendOTP = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Something went wrong while sending otp: " + error.message
+            message: "Something went wrong while sending otp"
         })
     }
 }
@@ -140,11 +142,74 @@ exports.signUp = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "User cannot be registered. Please try again." + error.message
+            message: "User cannot be registered. Please try again."
         })
     }
 }
 
 // logIn
+exports.login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // validation
+        if (!email || !password) {
+            return res.send(403).json({
+                success: false,
+                message: "All fields are required, Please try again!"
+            })
+        }
+
+        // check user exist or not
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "User is not registered, Please register first"
+            })
+        }
+
+        // check password and generate JWT token
+        if (await bcrypt.compare(password, user.password)) {
+            const payload = {
+                email: user.email,
+                id: user._id,
+                accountType: user.accountType
+            };
+
+            const token = jwt.sign(payload, process.env.JWT_SECRET, {
+                expiresIn: "2h"
+            });
+
+            // TODO: check whether token is adding in user object or not, else use toObject() method
+            user.token = token;
+            user.password = undefined;
+
+            // create cookie and send response
+            const options = {
+                expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+                httpOnly: true
+            };
+
+            return res.cookie("token", token, options).status(200).json({
+                success: true,
+                token,
+                user,
+                message: "User logged in successfully!"
+            })
+        }
+        else {
+            return res.status(401).json({
+                success: false,
+                message: "Password is incorrect!"
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Log in failure, Please try again!"
+        })
+    }
+}
 
 // changePassword
