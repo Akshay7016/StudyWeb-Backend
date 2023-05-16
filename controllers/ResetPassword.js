@@ -1,3 +1,5 @@
+const bcrypt = require("bcrypt");
+
 const User = require("../models/User");
 const mailSender = require("../utils/mailSender");
 
@@ -52,8 +54,68 @@ exports.resetPasswordToken = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Something went wrong while sending password reset mail"
-        })
+        });
     }
 };
 
 // resetPassword
+exports.resetPassword = async (req, res) => {
+    try {
+        // fetch data
+        const { token, password, confirmPassword } = req.body;
+
+        // validation
+        if (!token || !password || !confirmPassword) {
+            return res.send(403).json({
+                success: false,
+                message: "All fields are required, Please try again!"
+            })
+        };
+
+        if (password !== confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "password and confirmPassword must be same, please try again!"
+            })
+        };
+
+        // get user details from database using token
+        const userDetails = await User.findOne({ token });
+
+        // if no entry - invalid token
+        if (!userDetails) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid token"
+            })
+        };
+
+        // check for token timeout/expiry
+        if (userDetails.resetPasswordExpires < Date.now()) {
+            return res.status(403).json({
+                success: false,
+                message: "Token is expired, Please regenerate the token"
+            })
+        };
+
+        // hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // update password in database
+        await User.findOneAndUpdate(
+            { token },
+            { password: hashedPassword },
+            { new: true }
+        )
+        // return response
+        return res.status(200).json({
+            success: true,
+            message: "Password reset successful"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while resetting password "
+        })
+    }
+}
