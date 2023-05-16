@@ -244,7 +244,7 @@ exports.changePassword = async (req, res) => {
         await User.findOneAndUpdate({ email }, { password: hashedPassword });
 
         // send mail - password updated
-        const title = "Password change request";
+        const title = "Password change request successful";
         const mailBody = "Your StudyWeb account password has been updated successfully!";
 
         await mailSender(email, title, mailBody);
