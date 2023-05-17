@@ -29,8 +29,8 @@ exports.createCategory = async (req, res) => {
     }
 };
 
-// showAllCategories
-exports.showAllCategories = async (req, res) => {
+// getAllCategories
+exports.getAllCategories = async (req, res) => {
     try {
         // fetch all categories which contains name and description
         const allCategories = await Category.find({}, { name: true, description: true });

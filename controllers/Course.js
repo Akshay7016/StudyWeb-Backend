@@ -83,6 +83,27 @@ exports.createCourse = async (req, res) => {
             message: "Something went wrong while creating course"
         });
     }
-}
+};
 
 // getAllCourses
+exports.getAllCourses = async (req, res) => {
+    try {
+        const allCourses = await Course.find({}, {
+            courseName: true,
+            price: true,
+            thumbnail: true,
+            instructor: true,
+        }).populate("instructor").exec();
+
+        res.status(200).json({
+            success: true,
+            message: "All courses fetched successfully",
+            data: allCourses
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while fetching all courses"
+        });
+    }
+};
