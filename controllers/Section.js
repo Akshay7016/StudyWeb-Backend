@@ -44,3 +44,35 @@ exports.createSection = async (req, res) => {
         });
     }
 };
+
+// updateSection
+exports.updateSection = async (req, res) => {
+    try {
+        // fetch data
+        const { sectionName, sectionId } = req.body;
+
+        // validation
+        if (!sectionName || !sectionId) {
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required"
+            });
+        };
+
+        // update entry in database
+        const updatedSection = await Section.findByIdAndUpdate(sectionId, { sectionName }, { new: true });
+
+        // return response
+        return res.status(200).json({
+            success: true,
+            message: "Section updated successfully",
+            data: updatedSection
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while updating section",
+            error: error.message
+        });
+    }
+};
