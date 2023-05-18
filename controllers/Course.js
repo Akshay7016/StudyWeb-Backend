@@ -8,13 +8,13 @@ const fileUploader = require("../utils/fileUploader");
 exports.createCourse = async (req, res) => {
     try {
         // fetch data from request body
-        const { courseName, courseDescription, whatYouWillLearn, price, category } = req.body;
+        const { courseName, courseDescription, whatYouWillLearn, price, category, tags } = req.body;
 
         // get thumbnail
         const thumbnail = req.files.thumbnailImage;
 
         // validation
-        if (!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !thumbnail) {
+        if (!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !tags || !thumbnail) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
@@ -45,6 +45,7 @@ exports.createCourse = async (req, res) => {
             whatYouWillLearn,
             price,
             category,
+            tags,
             thumbnail: thumbnailImage.secure_url
         });
 
@@ -93,6 +94,7 @@ exports.getAllCourses = async (req, res) => {
             price: true,
             thumbnail: true,
             instructor: true,
+            tags: true
         }).populate("instructor").exec();
 
         res.status(200).json({
