@@ -76,3 +76,28 @@ exports.updateSection = async (req, res) => {
         });
     }
 };
+
+// deleteSection
+exports.deleteSection = async (req, res) => {
+    try {
+        // get id -> assuming that we are passing ID in params
+        const { sectionId } = req.params;
+
+        // delete entry from database
+        await Section.findByIdAndDelete(sectionId);
+
+        // TODO: do we need to delete the sectionID entry from the Course schema
+
+        // return response
+        return res.status(200).json({
+            success: true,
+            message: "Section deleted successfully",
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while deleting section",
+            error: error.message
+        });
+    }
+}
