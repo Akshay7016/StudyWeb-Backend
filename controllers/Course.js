@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const Course = require("../models/Course");
 const Category = require("../models/Category");
 const User = require("../models/User");
@@ -35,7 +37,7 @@ exports.createCourse = async (req, res) => {
         };
 
         // Upload image/thumbnail to cloudinary
-        const thumbnailImage = await fileUploader(thumbnail, "Thumbnail");
+        const thumbnailImage = await fileUploader(thumbnail, process.env.FOLDER_NAME);
 
         // create an entry for new course
         const newCourse = await Course.create({
