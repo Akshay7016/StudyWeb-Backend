@@ -57,3 +57,9 @@ exports.createSubSection = async (req, res) => {
         });
     }
 };
+
+// updateSubSection
+// TODO: add controller for updateSubSection
+
+// deleteSubSection
+// TODO: add controller for deleteSubSection
