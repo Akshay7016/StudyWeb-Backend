@@ -8,6 +8,7 @@ const OTP = require("../models/OTP");
 const Profile = require("../models/Profile");
 
 const mailSender = require("../utils/mailSender");
+const { passwordUpdated } = require("../mail/templates/passwordUpdate")
 
 // sendOTP
 exports.sendOTP = async (req, res) => {
@@ -58,7 +59,8 @@ exports.sendOTP = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Something went wrong while sending otp"
+            message: "Something went wrong while sending otp",
+            error: error.message
         })
     }
 };
@@ -99,7 +101,7 @@ exports.signUp = async (req, res) => {
         const recentOtp = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
 
         // validate otp
-        if (recentOtp.otp.length === 0) {
+        if (recentOtp.length === 0) {
             return res.status(400).json({
                 success: false,
                 message: "OTP not found!"
@@ -107,7 +109,7 @@ exports.signUp = async (req, res) => {
         }
 
         // check otp present in database and otp entered by user are same
-        if (recentOtp.otp !== otp) {
+        if (recentOtp[0].otp !== otp) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid OTP"
@@ -116,6 +118,10 @@ exports.signUp = async (req, res) => {
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        // FIXME: check why approved use
+        let approved = "";
+        approved = approved === "Instructor" ? false : true
 
         // create Profile entry in database as we need it for additionalDetails field. After that we can refer profile entry to edit additional details.
         const profileDetails = await Profile.create({
@@ -133,6 +139,7 @@ exports.signUp = async (req, res) => {
             contactNumber,
             password: hashedPassword,
             accountType,
+            approved: approved,
             additionalDetails: profileDetails._id,
             image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`
         })
@@ -145,7 +152,8 @@ exports.signUp = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "User cannot be registered. Please try again."
+            message: "User cannot be registered. Please try again.",
+            error: error.message
         })
     }
 };
@@ -174,6 +182,7 @@ exports.login = async (req, res) => {
 
         // check password and generate JWT token
         if (await bcrypt.compare(password, user.password)) {
+            // FIXME: accountType changed to role
             const payload = {
                 email: user.email,
                 id: user._id,
@@ -181,7 +190,7 @@ exports.login = async (req, res) => {
             };
 
             const token = jwt.sign(payload, process.env.JWT_SECRET, {
-                expiresIn: "2h"
+                expiresIn: "24h"
             });
 
             // TODO: check whether token is adding in user object or not, else use toObject() method
@@ -210,16 +219,31 @@ exports.login = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Log in failure, Please try again!"
+            message: "Log in failure, Please try again!",
+            error: error.message
         })
     }
 };
 
 // changePassword
+// TODO: Check once while testing
 exports.changePassword = async (req, res) => {
     try {
-        const { email } = req.user;
-        const { newPassword, confirmNewPassword } = req.body;
+        const { id } = req.user;
+        const { oldPassword, newPassword, confirmNewPassword } = req.body;
+
+        const userDetails = await User.findById(id);
+
+        // validate old password
+        const isPasswordMatch = await bcrypt.compare(oldPassword, userDetails.password);
+        
+        if (!isPasswordMatch) {
+            // If old password does not match, return a 401 (Unauthorized) error
+            return res.status(401).json({
+                success: false,
+                message: "The password is incorrect"
+            });
+        }
 
         // validation
         if (!newPassword || !confirmNewPassword) {
@@ -241,13 +265,14 @@ exports.changePassword = async (req, res) => {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
         // update password in database
-        await User.findOneAndUpdate({ email }, { password: hashedPassword }, { new: true });
+        const updatedDetails = await User.findByIdAndUpdate(id, { password: hashedPassword }, { new: true });
 
         // send mail - password updated
-        const title = "Password change request successful";
-        const mailBody = "Your StudyWeb account password has been updated successfully!";
-
-        await mailSender(email, title, mailBody);
+        await mailSender(
+            updatedDetails.email,
+            "Password change request successful",
+            passwordUpdated(email, `Password updated successfully for ${updatedDetails.firstName} ${updatedDetails.lastName}`)
+        );
 
         // return response
         return res.status(200).json({
@@ -257,7 +282,8 @@ exports.changePassword = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Something went wrong while updating account password"
+            message: "Something went wrong while updating account password",
+            error: error.message
         })
     }
 };
