@@ -26,12 +26,12 @@ exports.resetPasswordToken = async (req, res) => {
         };
 
         // generate token
-        const token = crypto.randomUUID();
+        const token = crypto.randomBytes(20).toString("hex");
 
         // update User by adding token and expiration time
         const updatedDetails = await User.findOneAndUpdate(
             { email },
-            { token: token, resetPasswordExpires: Date.now() + 5 * 60 * 1000 },
+            { token: token, resetPasswordExpires: Date.now() + 3600000 },
             { new: true }
         );
 
@@ -65,7 +65,7 @@ exports.resetPassword = async (req, res) => {
         const { token, password, confirmPassword } = req.body;
 
         // validation
-        if (!token || !password || !confirmPassword) {
+        if (!password || !confirmPassword) {
             return res.send(403).json({
                 success: false,
                 message: "All fields are required, Please try again!"
