@@ -8,13 +8,13 @@ const fileUploader = require("../utils/fileUploader");
 exports.createSubSection = async (req, res) => {
     try {
         // fetch data
-        const { sectionId, title, timeDuration, description } = req.body;
+        const { sectionId, title, description } = req.body;
 
         // extract video file
         const video = req.files.videoFile;
 
         // validation
-        if (!sectionId || !title || !timeDuration || !description || !video) {
+        if (!sectionId || !title || !description || !video) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
@@ -27,7 +27,7 @@ exports.createSubSection = async (req, res) => {
         // create sub section in database
         const subSectionDetails = await SubSection.create({
             title,
-            timeDuration,
+            timeDuration: `${videoDetails.duration}`,
             description,
             videoUrl: videoDetails.secure_url
         });

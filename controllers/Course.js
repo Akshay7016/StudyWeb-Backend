@@ -147,3 +147,6 @@ exports.getAllCourses = async (req, res) => {
         });
     }
 };
+
+// getCourseDetails
+// TODO: Add controller for getCourseDetails

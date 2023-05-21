@@ -109,4 +109,10 @@ exports.getUserDetails = async (req, res) => {
             error: error.message
         });
     }
-}
+};
+
+// updateDisplayPicture
+// TODO: add updateDisplayPicture controller
+
+// getEnrolledCourses
+// TODO: add getEnrolledCourses controller

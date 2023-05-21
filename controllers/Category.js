@@ -14,12 +14,13 @@ exports.createCategory = async (req, res) => {
         };
 
         // Add category entry in database
-        await Category.create({ name, description });
+        const categoryDetails = await Category.create({ name, description });
 
         // return response
         return res.status(200).json({
             success: true,
             message: "Category created successfully",
+            data: categoryDetails
         })
     } catch (error) {
         return res.status(500).json({
@@ -48,3 +49,5 @@ exports.getAllCategories = async (req, res) => {
     }
 };
 
+// categoryPageDetails
+// TODO: add categoryPageDetails controller

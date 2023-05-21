@@ -119,7 +119,7 @@ exports.signUp = async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // FIXME: check why approved use
+        // FIXME: check why approved use and checking is wrong
         let approved = "";
         approved = approved === "Instructor" ? false : true
 
