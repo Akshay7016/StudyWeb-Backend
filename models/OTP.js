@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const mailSender = require("../utils/mailSender");
+const emailTemplate = require("../mail/templates/emailVerificationTemplate")
 
 const OTPSchema = new mongoose.Schema({
     email: {
@@ -14,17 +15,20 @@ const OTPSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now(),
-        expires: 5 * 60
+        expires: 5 * 60 // The document will be automatically deleted after 5 minutes of its creation time
     }
 });
 
 const sendVerificationMail = async (email, otp) => {
-    await mailSender(email, "Verification mail from StudyWeb", otp)
+    await mailSender(email, "Verification mail from StudyWeb", emailTemplate(otp))
 };
 
 // pre middleware
 OTPSchema.pre("save", async (next) => {
-    await sendVerificationMail(this.email, this.otp);
+    // Only send an email when a new document is created
+    if (this.isNew) {
+        await sendVerificationMail(this.email, this.otp);
+    }
     next();
 })
 
