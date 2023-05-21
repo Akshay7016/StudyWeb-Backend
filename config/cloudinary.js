@@ -10,4 +10,6 @@ const cloudinaryConnect = () => {
     } catch (error) {
         console.log(error);
     }
-}
+};
+
+module.exports = cloudinaryConnect;
