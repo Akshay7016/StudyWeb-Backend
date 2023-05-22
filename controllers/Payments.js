@@ -82,3 +82,83 @@ exports.capturePayment = async (req, res) => {
         });
     }
 };
+
+// verifySignature
+exports.verifySignature = async (req, res) => {
+
+    // webhook secret stored at backend
+    const webhookSecret = "12345678";
+
+    // get webhook secret from Razorpay
+    const signature = req.headers("x-razorpay-signature");
+
+    // convert BE webhook secret to encrypted form to compare with signature
+    const shasum = crypto.createHmac("sha256", webhookSecret);
+    shasum.update(JSON.stringify(req.body));
+    const digest = shasum.digest("hex");
+
+    // now compare signature and digest, if equal then payment is authorized. Then find the course and enroll student in that course
+    if (digest === signature) {
+        // fetch courseId and userId from notes. As this call is coming from Razorpay to Backend, so it does not have any courseId and userId. But we have stored it in notes while order creation.  
+        const { courseId, userId } = req.body.payload.payment.entity.notes;
+
+        try {
+            // find the course and enroll student in that course
+            const enrolledCourse = await Course.findByIdAndUpdate(
+                courseId,
+                {
+                    $push: {
+                        studentsEnrolled: userId
+                    }
+                },
+                { new: true }
+            );
+
+            if (!enrolledCourse) {
+                return res.status(500).json({
+                    success: false,
+                    message: "Course not found"
+                })
+            };
+
+            // find the student and add the course into the courses list
+            const enrolledStudent = await User.findByIdAndUpdate(
+                userId,
+                {
+                    $push: {
+                        courses: courseId
+                    }
+                },
+                { new: true }
+            );
+
+            // now send the course enrollment mail to user
+            await mailSender(
+                enrolledStudent.email,
+                "Congratulations, You are enrolled into new StudyWeb course",
+                courseEnrollmentEmail(
+                    enrolledCourse.courseName,
+                    `${enrolledStudent.firstName} ${enrolledStudent.lastName}`
+                )
+            );
+
+            // return response
+            return res.status(200).json({
+                success: true,
+                message: "Signature verified and course added"
+            })
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: "Something went wrong while enrolling student",
+                error: error.message
+            });
+        }
+    } else {
+        return res.status(400).json({
+            success: false,
+            message: "Payment is not authorized",
+            error: error.message
+        });
+    }
+};
