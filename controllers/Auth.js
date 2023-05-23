@@ -68,7 +68,6 @@ exports.sendOTP = async (req, res) => {
 // signUp
 exports.signUp = async (req, res) => {
     try {
-        // TODO: confirmPassword and contactNumber fields are not present in User model
         const { firstName, lastName, email, password, confirmPassword, accountType, contactNumber, otp } = req.body;
 
         // validation
@@ -236,7 +235,7 @@ exports.changePassword = async (req, res) => {
 
         // validate old password
         const isPasswordMatch = await bcrypt.compare(oldPassword, userDetails.password);
-        
+
         if (!isPasswordMatch) {
             // If old password does not match, return a 401 (Unauthorized) error
             return res.status(401).json({

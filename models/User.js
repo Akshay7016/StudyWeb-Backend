@@ -20,6 +20,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    contactNumber: {
+        type: Number,
+        trim: true
+    },
     accountType: {
         type: String,
         required: true,
