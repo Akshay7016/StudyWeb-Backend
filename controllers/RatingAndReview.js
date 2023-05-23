@@ -117,3 +117,32 @@ exports.getAverageRating = async (req, res) => {
         });
     }
 };
+
+// getAllRatingAndReview
+exports.getAllRatingAndReview = async (req, res) => {
+    try {
+        const allRatingAndReviews = await RatingAndReview.find({})
+            .sort({ rating: "desc" })
+            .populate({
+                path: "user",
+                select: "firstName lastName email image" // as we are using {firstName:true}, it is also same with different syntax
+            })
+            .populate({
+                path: "course",
+                select: "courseName"
+            })
+            .exec();
+
+        return res.status(200).json({
+            success: true,
+            message: "All ratings and reviews fetched successfully",
+            data: allRatingAndReviews
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while fetching all ratings and reviews",
+            error: error.message
+        });
+    }
+};
