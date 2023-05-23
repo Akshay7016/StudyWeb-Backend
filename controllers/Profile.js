@@ -155,4 +155,35 @@ exports.updateDisplayPicture = async (req, res) => {
 };
 
 // getEnrolledCourses
-// TODO: add getEnrolledCourses controller
+exports.getEnrolledCourses = async (req, res) => {
+    try {
+        // get user id
+        const userId = req.user.id;
+
+        // find enrolled courses
+        const userDetails = await User.findById(userId)
+            .populate("courses")
+            .exec();
+
+        // validation
+        if (!userDetails) {
+            return res.status(400).json({
+                success: false,
+                message: `Could not find the user with id: ${userId}`
+            })
+        };
+
+        // return response
+        return res.status(200).json({
+            success: true,
+            message: "Successfully fetched the courses enrolled by the user",
+            data: userDetails.courses
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while fetching enrolled courses",
+            error: error.message
+        });
+    }
+};
