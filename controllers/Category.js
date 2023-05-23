@@ -25,7 +25,8 @@ exports.createCategory = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Something went wrong while creating category"
+            message: "Something went wrong while creating category",
+            error: error.message
         })
     }
 };
@@ -44,10 +45,51 @@ exports.getAllCategories = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Something went wrong while fetching all categories"
+            message: "Something went wrong while fetching all categories",
+            error: error.message
         })
     }
 };
 
 // categoryPageDetails
-// TODO: add categoryPageDetails controller
+exports.categoryPageDetails = async (req, res) => {
+    try {
+        // get categoryId
+        const { categoryId } = req.body;
+
+        // find courses for specified ID
+        const selectedCourses = await Category.findById(categoryId)
+            .populate("courses")
+            .exec();
+
+        if (!selectedCourses) {
+            return res.status(404).json({
+                success: false,
+                message: "Courses not found with specific category"
+            });
+        };
+
+        // find courses other than specified ID
+        const differentCourses = await Category.findById({ _id: { $ne: categoryId } })
+            .populate("courses")
+            .exec();
+
+        // TODO: find top selling courses and return in response
+
+        // return response
+        return res.status(200).json({
+            success: true,
+            message: "Courses fetched successfully",
+            data: {
+                selectedCourses,
+                differentCourses
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while fetching category page details",
+            error: error.message
+        })
+    }
+}
