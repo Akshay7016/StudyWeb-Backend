@@ -1,5 +1,9 @@
+require("dotenv").config();
+
 const Profile = require("../models/Profile");
 const User = require("../models/User");
+
+const fileUploader = require("../utils/fileUploader");
 
 // updateProfile
 exports.updateProfile = async (req, res) => {
@@ -112,7 +116,43 @@ exports.getUserDetails = async (req, res) => {
 };
 
 // updateDisplayPicture
-// TODO: add updateDisplayPicture controller
+exports.updateDisplayPicture = async (req, res) => {
+    try {
+        // get user id
+        const userId = req.user.id;
+
+        // get new display picture
+        const displayPicture = req.files.displayPicture;
+
+        // upload image to cloudinary
+        const newImage = await fileUploader(
+            displayPicture,
+            process.env.FOLDER_NAME,
+            1000,
+            1000
+        );
+
+        // update user schema
+        const updatedProfile = await User.findByIdAndUpdate(
+            userId,
+            { image: newImage.secure_url },
+            { new: true }
+        );
+
+        // return response
+        return res.status(200).json({
+            success: true,
+            message: "Profile picture updated successfully",
+            data: updatedProfile
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while updating profile picture",
+            error: error.message
+        });
+    }
+};
 
 // getEnrolledCourses
 // TODO: add getEnrolledCourses controller
