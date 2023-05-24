@@ -116,12 +116,33 @@ exports.deleteSubSection = async (req, res) => {
     try {
         const { sectionId, subSectionId } = req.body;
 
+        // validation
         if (!sectionId || !subSectionId) {
             return res.status(404).json({
                 success: false,
                 message: "sectionId and subSectionId is required"
             });
-        }
+        };
+
+        // check whether section with id present or not
+        const sectionDetails = await Section.findById(sectionId);
+
+        if (!sectionDetails) {
+            return res.status(404).json({
+                success: false,
+                message: `Could not found section with id ${sectionId}`
+            });
+        };
+
+        // check whether sub section with id present or not
+        const subSectionDetails = await SubSection.findById(subSectionId);
+
+        if (!subSectionDetails) {
+            return res.status(404).json({
+                success: false,
+                message: `Could not found sub section with id ${subSectionId}`
+            });
+        };
 
         // delete sub section id from section schema
         await Section.findByIdAndUpdate(
