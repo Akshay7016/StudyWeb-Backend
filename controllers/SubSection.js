@@ -63,6 +63,13 @@ exports.updateSubSection = async (req, res) => {
     try {
         const { sectionId, title, description } = req.body;
 
+        if (!sectionId) {
+            return res.status(404).json({
+                success: false,
+                message: "Sub section Id is required"
+            })
+        }
+
         const subSection = await SubSection.findById(sectionId);
 
         if (!subSection) {
