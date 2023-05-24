@@ -112,4 +112,40 @@ exports.updateSubSection = async (req, res) => {
 };
 
 // deleteSubSection
-// TODO: add controller for deleteSubSection
+exports.deleteSubSection = async (req, res) => {
+    try {
+        const { sectionId, subSectionId } = req.body;
+
+        if (!sectionId || !subSectionId) {
+            return res.status(404).json({
+                success: false,
+                message: "sectionId and subSectionId is required"
+            });
+        }
+
+        // delete sub section id from section schema
+        await Section.findByIdAndUpdate(
+            sectionId,
+            {
+                $pull: {
+                    subSection: subSectionId
+                }
+            },
+            { new: true }
+        );
+
+        // delete sub section
+        await SubSection.findByIdAndDelete(subSectionId);
+
+        return res.status(200).json({
+            success: true,
+            message: "Sub section deleted successfully"
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while deleting sub section",
+            error: error.message
+        });
+    }
+};
