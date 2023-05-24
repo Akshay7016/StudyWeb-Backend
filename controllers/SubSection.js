@@ -59,7 +59,50 @@ exports.createSubSection = async (req, res) => {
 };
 
 // updateSubSection
-// TODO: add controller for updateSubSection
+exports.updateSubSection = async (req, res) => {
+    try {
+        const { sectionId, title, description } = req.body;
+
+        const subSection = await SubSection.findById(sectionId);
+
+        if (!subSection) {
+            return res.status(404).json({
+                success: false,
+                message: "Sub section not found"
+            });
+        };
+
+        if (title !== undefined) {
+            subSection.title = title;
+        }
+
+        if (description !== undefined) {
+            subSection.description = description;
+        }
+
+        if (req.files && req.files.videoFile !== undefined) {
+            const video = req.files.videoFile;
+            const uploadDetails = await fileUploader(video, process.env.FOLDER_NAME);
+
+            subSection.videoUrl = uploadDetails.secure_url;
+            subSection.timeDuration = `${uploadDetails.duration}`
+        }
+
+        const updatedSubSection = await subSection.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Sub section details updated successfully",
+            data: updatedSubSection
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while updating sub section",
+            error: error.message
+        });
+    }
+};
 
 // deleteSubSection
 // TODO: add controller for deleteSubSection
