@@ -15,6 +15,6 @@ const {
 router.post("/capturePayment", auth, isStudent, capturePayment);
 
 // Route for verify signature
-router.post("verifySignature", verifySignature);
+router.post("/verifySignature", verifySignature);
 
 module.exports = router;
