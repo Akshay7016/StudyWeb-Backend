@@ -227,7 +227,6 @@ exports.login = async (req, res) => {
 };
 
 // changePassword
-// TODO: Check once while testing
 exports.changePassword = async (req, res) => {
     try {
         const { id } = req.user;
@@ -272,7 +271,7 @@ exports.changePassword = async (req, res) => {
         await mailSender(
             updatedDetails.email,
             "Password change request successful",
-            passwordUpdated(email, `Password updated successfully for ${updatedDetails.firstName} ${updatedDetails.lastName}`)
+            passwordUpdated(updatedDetails.email, `Password updated successfully for ${updatedDetails.firstName} ${updatedDetails.lastName}`)
         );
 
         // return response
