@@ -271,7 +271,7 @@ exports.changePassword = async (req, res) => {
         await mailSender(
             updatedDetails.email,
             "Password change request successful",
-            passwordUpdated(updatedDetails.email, `Password updated successfully for ${updatedDetails.firstName} ${updatedDetails.lastName}`)
+            passwordUpdated(updatedDetails.email, `${updatedDetails.firstName} ${updatedDetails.lastName}`)
         );
 
         // return response
