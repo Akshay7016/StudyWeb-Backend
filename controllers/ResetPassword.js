@@ -67,7 +67,7 @@ exports.resetPassword = async (req, res) => {
 
         // validation
         if (!password || !confirmPassword) {
-            return res.send(403).json({
+            return res.status(403).json({
                 success: false,
                 message: "All fields are required, Please try again!"
             })

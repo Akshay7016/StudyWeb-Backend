@@ -166,7 +166,7 @@ exports.login = async (req, res) => {
 
         // validation
         if (!email || !password) {
-            return res.send(403).json({
+            return res.status(403).json({
                 success: false,
                 message: "All fields are required, Please try again!"
             })
@@ -248,7 +248,7 @@ exports.changePassword = async (req, res) => {
 
         // validation
         if (!newPassword || !confirmNewPassword) {
-            return res.send(403).json({
+            return res.status(403).json({
                 success: false,
                 message: "All fields are required, Please try again!"
             })
