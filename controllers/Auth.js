@@ -52,9 +52,6 @@ exports.sendOTP = async (req, res) => {
         // create otp entry in database
         await OTP.create({ email, otp });
 
-        // TODO: add mail for otp sent in proper format
-        await mailSender(email, "OTP for signup", `<h1>${otp}</h1>`);
-
         return res.status(200).json({
             success: true,
             message: "OTP sent successfully"

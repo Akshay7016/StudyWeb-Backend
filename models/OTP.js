@@ -20,11 +20,11 @@ const OTPSchema = new mongoose.Schema({
 });
 
 const sendVerificationMail = async (email, otp) => {
-    await mailSender(email, "Verification mail from StudyWeb", emailTemplate(otp))
+    await mailSender(email, "Verification OTP for Signup", emailTemplate(otp))
 };
 
 // pre middleware
-OTPSchema.pre("save", async (next) => {
+OTPSchema.pre("save", async function (next) {
     // Only send an email when a new document is created
     if (this.isNew) {
         await sendVerificationMail(this.email, this.otp);
