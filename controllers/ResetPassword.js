@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 const User = require("../models/User");
 const mailSender = require("../utils/mailSender");
@@ -54,7 +55,8 @@ exports.resetPasswordToken = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Something went wrong while sending password reset mail"
+            message: "Something went wrong while sending password reset mail",
+            error: error.message
         });
     }
 };
@@ -116,7 +118,8 @@ exports.resetPassword = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Something went wrong while resetting password "
+            message: "Something went wrong while resetting password",
+            error: error.message
         })
     }
 }
