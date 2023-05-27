@@ -27,7 +27,7 @@ exports.sendOTP = async (req, res) => {
         }
 
         // generate otp
-        let otp = otpGenerator.generate(6, {
+        const otp = otpGenerator.generate(6, {
             upperCaseAlphabets: false,
             lowerCaseAlphabets: false,
             specialChars: false
@@ -167,7 +167,6 @@ exports.login = async (req, res) => {
 
         // check password and generate JWT token
         if (await bcrypt.compare(password, user.password)) {
-            // FIXME: accountType changed to role
             const payload = {
                 email: user.email,
                 id: user._id,
@@ -178,7 +177,6 @@ exports.login = async (req, res) => {
                 expiresIn: "24h"
             });
 
-            // TODO: check whether token is adding in user object or not, else use toObject() method
             user.token = token;
             user.password = undefined;
 
