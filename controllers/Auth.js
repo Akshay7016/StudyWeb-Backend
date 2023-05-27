@@ -27,27 +27,11 @@ exports.sendOTP = async (req, res) => {
         }
 
         // generate otp
-        // TODO: check js library which generates unique otp always
         let otp = otpGenerator.generate(6, {
             upperCaseAlphabets: false,
             lowerCaseAlphabets: false,
             specialChars: false
         });
-
-        // check unique otp or not
-        // Because same otp can be generated for other user previously
-        let result = await OTP.findOne({ otp });
-
-        // if generated otp is not unique then generate new otp
-        while (result) {
-            otp = otpGenerator.generate(6, {
-                upperCaseAlphabets: false,
-                lowerCaseAlphabets: false,
-                specialChars: false
-            });
-
-            result = await OTP.findOne({ otp });
-        }
 
         // create otp entry in database
         await OTP.create({ email, otp });
