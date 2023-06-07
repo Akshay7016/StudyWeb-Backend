@@ -70,6 +70,7 @@ exports.categoryPageDetails = async (req, res) => {
         };
 
         // find courses other than specified ID
+        // TODO: error in fetching different courses
         const differentCourses = await Category.findById({ _id: { $ne: categoryId } })
             .populate("courses")
             .exec();
