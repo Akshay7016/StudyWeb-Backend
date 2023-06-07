@@ -10,7 +10,7 @@ const fileUploader = require("../utils/fileUploader");
 exports.createCourse = async (req, res) => {
     try {
         // fetch data from request body
-        const {
+        let {
             courseName,
             courseDescription,
             whatYouWillLearn,
