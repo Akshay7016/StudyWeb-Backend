@@ -93,18 +93,56 @@ exports.updateSection = async (req, res) => {
 // deleteSection
 exports.deleteSection = async (req, res) => {
     try {
-        // get id -> assuming that we are passing ID in params
-        const { sectionId } = req.params;
+
+        const { sectionId, courseId } = req.body;
+
+        // validation
+        if (!sectionId || !courseId) {
+            return res.status(404).json({
+                success: false,
+                message: "sectionId and courseId is required"
+            });
+        };
+
+        // check whether section with id present or not
+        const sectionDetails = await Section.findById(sectionId);
+
+        if (!sectionDetails) {
+            return res.status(404).json({
+                success: false,
+                message: `Could not found section with id ${sectionId}`
+            });
+        };
+
+        // check whether course with id present or not
+        const courseDetails = await Course.findById(courseId);
+
+        if (!courseDetails) {
+            return res.status(404).json({
+                success: false,
+                message: `Could not found course with id ${courseId}`
+            });
+        };
+
+        // delete section id from Course schema
+        const updatedCourse = await Course.findByIdAndUpdate(
+            courseId,
+            {
+                $pull: {
+                    courseContent: sectionId
+                }
+            },
+            { new: true }
+        ).populate("courseContent").exec();
 
         // delete entry from database
         await Section.findByIdAndDelete(sectionId);
-
-        // TODO: do we need to delete the sectioId entry from the Course Schema, if yes then pass courseId with req body
 
         // return response
         return res.status(200).json({
             success: true,
             message: "Section deleted successfully",
+            data: updatedCourse
         });
     } catch (error) {
         return res.status(500).json({
