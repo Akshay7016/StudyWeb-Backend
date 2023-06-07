@@ -15,6 +15,15 @@ exports.createSection = async (req, res) => {
             });
         };
 
+        const courseDetails = await Course.findById(courseId);
+
+        if (!courseDetails) {
+            return res.status(404).json({
+                success: false,
+                message: `Course with ID ${courseId} not found.`,
+            });
+        };
+
         // create section
         const newSection = await Section.create({ sectionName });
 
