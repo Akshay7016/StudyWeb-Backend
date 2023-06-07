@@ -124,13 +124,25 @@ exports.deleteSection = async (req, res) => {
             });
         };
 
-        // delete entry from database, it will automatically delete sectionId entry from Course schema
+        // delete section id from Course schema
+        const updatedCourse = await Course.findByIdAndUpdate(
+            courseId,
+            {
+                $pull: {
+                    courseContent: sectionId
+                }
+            },
+            { new: true }
+        ).populate("courseContent").exec();
+
+        // delete entry from database
         await Section.findByIdAndDelete(sectionId);
 
         // return response
         return res.status(200).json({
             success: true,
             message: "Section deleted successfully",
+            data: updatedCourse
         });
     } catch (error) {
         return res.status(500).json({
