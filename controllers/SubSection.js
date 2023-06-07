@@ -145,7 +145,7 @@ exports.deleteSubSection = async (req, res) => {
         };
 
         // delete sub section id from section schema
-        await Section.findByIdAndUpdate(
+        const updatedSection = await Section.findByIdAndUpdate(
             sectionId,
             {
                 $pull: {
@@ -153,14 +153,15 @@ exports.deleteSubSection = async (req, res) => {
                 }
             },
             { new: true }
-        );
+        ).populate("subSection").exec();
 
         // delete sub section
         await SubSection.findByIdAndDelete(subSectionId);
 
         return res.status(200).json({
             success: true,
-            message: "Sub section deleted successfully"
+            message: "Sub section deleted successfully",
+            data: updatedSection
         });
     } catch (error) {
         return res.status(500).json({
