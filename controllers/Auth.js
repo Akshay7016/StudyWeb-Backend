@@ -52,7 +52,7 @@ exports.sendOTP = async (req, res) => {
 // signUp
 exports.signUp = async (req, res) => {
     try {
-        const { firstName, lastName, email, password, confirmPassword, accountType, contactNumber, otp } = req.body;
+        const { firstName, lastName, email, password, confirmPassword, accountType, otp } = req.body;
 
         // validation
         if (!firstName || !lastName || !email || !password || !confirmPassword || !otp) {
@@ -119,7 +119,6 @@ exports.signUp = async (req, res) => {
             firstName,
             lastName,
             email,
-            contactNumber,
             password: hashedPassword,
             accountType,
             approved: approved,
