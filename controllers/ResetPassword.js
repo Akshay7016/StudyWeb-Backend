@@ -3,7 +3,9 @@ const crypto = require("crypto");
 
 const User = require("../models/User");
 const mailSender = require("../utils/mailSender");
-const { passwordUpdated } = require("../mail/templates/passwordUpdate")
+const { passwordUpdated } = require("../mail/templates/passwordUpdate");
+const { passwordResetTemplate } = require("../mail/templates/passwordResetTemplate");
+
 
 // resetPasswordToken
 exports.resetPasswordToken = async (req, res) => {
@@ -41,11 +43,10 @@ exports.resetPasswordToken = async (req, res) => {
         const url = `http://localhost:3000/update-password/${token}`;
 
         // send mail containing the url
-        // TODO: use mail template
         await mailSender(
             email,
-            "Password Reset Link",
-            `Password reset link: ${url}`
+            "[StudyWeb] Password Reset Link",
+            passwordResetTemplate(url, `${updatedDetails.firstName} ${updatedDetails.lastName}`)
         );
 
         // return response
