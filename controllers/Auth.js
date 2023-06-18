@@ -136,7 +136,7 @@ exports.signUp = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "User cannot be registered. Please try again.",
+            message: "Failed to register user, Please try again.",
             error: error.message
         })
     }
@@ -160,7 +160,7 @@ exports.login = async (req, res) => {
         if (!user) {
             return res.status(401).json({
                 success: false,
-                message: "User is not registered, Please register first"
+                message: "User is not registered with us"
             })
         }
 
