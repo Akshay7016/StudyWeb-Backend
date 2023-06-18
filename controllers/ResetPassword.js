@@ -29,10 +29,10 @@ exports.resetPasswordToken = async (req, res) => {
         // generate token
         const token = crypto.randomBytes(20).toString("hex");
 
-        // update User by adding token and expiration time
+        // update User by adding token and expiration time (30 minutes)
         const updatedDetails = await User.findOneAndUpdate(
             { email },
-            { token: token, resetPasswordExpires: Date.now() + 3600000 },
+            { token: token, resetPasswordExpires: Date.now() + 1800000 },
             { new: true }
         );
 
@@ -89,7 +89,7 @@ exports.resetPassword = async (req, res) => {
         if (!userDetails) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid token"
+                message: "Invalid token, Please try again"
             })
         };
 
@@ -97,7 +97,7 @@ exports.resetPassword = async (req, res) => {
         if (userDetails.resetPasswordExpires < Date.now()) {
             return res.status(403).json({
                 success: false,
-                message: "Token is expired, Please regenerate the token"
+                message: "Token is expired, Please try again"
             })
         };
 
