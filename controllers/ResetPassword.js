@@ -25,7 +25,7 @@ exports.resetPasswordToken = async (req, res) => {
         if (!user) {
             return res.status(401).json({
                 success: false,
-                message: `User not registered with us`
+                message: `User is not registered with us`
             });
         };
 
