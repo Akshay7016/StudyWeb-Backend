@@ -9,13 +9,13 @@ const fileUploader = require("../utils/fileUploader");
 exports.updateProfile = async (req, res) => {
     try {
         // fetch data
-        const { dateOfBirth = "", about = "", gender, contactNumber } = req.body;
+        const { firstName, lastName, dateOfBirth, about, gender, contactNumber } = req.body;
 
         // fetch user id from payload
         const { id } = req.user;
 
         // validation
-        if (!gender || !contactNumber) {
+        if (!firstName || !lastName || !dateOfBirth || !about || !gender || !contactNumber) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
@@ -26,7 +26,7 @@ exports.updateProfile = async (req, res) => {
         const { additionalDetails } = await User.findById(id);
 
         // update Profile
-        const updatedProfile = await Profile.findByIdAndUpdate(
+        await Profile.findByIdAndUpdate(
             additionalDetails,
             {
                 gender,
@@ -37,11 +37,21 @@ exports.updateProfile = async (req, res) => {
             { new: true }
         );
 
+        // update user
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            {
+                firstName,
+                lastName
+            },
+            { new: true }
+        ).populate("additionalDetails").exec();
+
         // return response
         return res.status(200).json({
             success: true,
             message: "User profile updated successfully",
-            data: updatedProfile
+            data: updatedUser
         });
     } catch (error) {
         return res.status(500).json({
