@@ -137,7 +137,7 @@ exports.updateDisplayPicture = async (req, res) => {
             userId,
             { image: newImage.secure_url },
             { new: true }
-        ).populate("additionalDetails");
+        ).populate("additionalDetails").exec();
 
         // return response
         return res.status(200).json({
