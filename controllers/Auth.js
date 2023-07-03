@@ -211,12 +211,12 @@ exports.login = async (req, res) => {
 exports.changePassword = async (req, res) => {
     try {
         const { id } = req.user;
-        const { oldPassword, newPassword, confirmNewPassword } = req.body;
+        const { currentPassword, newPassword } = req.body;
 
         const userDetails = await User.findById(id);
 
         // validate old password
-        const isPasswordMatch = await bcrypt.compare(oldPassword, userDetails.password);
+        const isPasswordMatch = await bcrypt.compare(currentPassword, userDetails.password);
 
         if (!isPasswordMatch) {
             // If old password does not match, return a 401 (Unauthorized) error
@@ -225,22 +225,6 @@ exports.changePassword = async (req, res) => {
                 message: "The password is incorrect"
             });
         }
-
-        // validation
-        if (!newPassword || !confirmNewPassword) {
-            return res.status(403).json({
-                success: false,
-                message: "All fields are required, Please try again!"
-            })
-        };
-
-        // check newPassword and confirmNewPassword are same or not
-        if (newPassword !== confirmNewPassword) {
-            return res.status(400).json({
-                success: false,
-                message: "newPassword and confirmNewPassword must be same, please try again!"
-            })
-        };
 
         // Hashed password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
