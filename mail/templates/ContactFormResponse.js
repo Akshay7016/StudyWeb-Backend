@@ -1,12 +1,12 @@
 exports.contactFormResponse = (
-    email,
-    firstname,
-    lastname,
-    message,
-    phoneNo,
-    countrycode
+  email,
+  firstname,
+  lastname,
+  message,
+  phoneNo,
+  countrycode
 ) => {
-    return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
     <html>
     <head>
       <meta charset="UTF-8" />
@@ -74,7 +74,7 @@ exports.contactFormResponse = (
           <p>Here are the customer details provided for more information:</p>
           <p>Name: ${firstname} ${lastname}</p>
           <p>Email: ${email}</p>
-          <p>Phone Number:${countrycode}${phoneNo}</p>
+          <p>Phone Number: ${countrycode}${phoneNo}</p>
           <p>Message: ${message}</p>
           <p>Please provide solution to the customer. Thank you!</p>
         </div>
