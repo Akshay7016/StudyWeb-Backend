@@ -235,7 +235,7 @@ exports.changePassword = async (req, res) => {
         // send mail - password updated
         await mailSender(
             updatedDetails.email,
-            "[StudyWeb] Your StudyWeb password has changed",
+            "[StudyWeb] Your StudyWeb password has updated",
             passwordUpdated(updatedDetails.email, `${updatedDetails.firstName} ${updatedDetails.lastName}`)
         );
 
