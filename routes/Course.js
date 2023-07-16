@@ -6,7 +6,8 @@ const {
     getAllCourses,
     getCourseDetails,
     editCourse,
-    getFullCourseDetails
+    getFullCourseDetails,
+    getInstructorCourses
 } = require("../controllers/Course");
 
 const {
@@ -67,6 +68,9 @@ router.delete("/deleteSubSection", auth, isInstructor, deleteSubSection);
 
 // Add a sub section to section
 router.post("/addSubSection", auth, isInstructor, createSubSection);
+
+// Get all courses under a specific instructor
+router.get("/getInstructorCourses", auth, isInstructor, getInstructorCourses);
 
 // Get all registered courses
 router.get("/getAllCourses", getAllCourses);
