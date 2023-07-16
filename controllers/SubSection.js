@@ -3,6 +3,7 @@ require("dotenv").config();
 const SubSection = require("../models/SubSection");
 const Section = require("../models/Section");
 const fileUploader = require("../utils/fileUploader");
+const { deleteFileFromCloudinary } = require("../utils/deleteFileFromCloudinary");
 
 // createSubSection
 exports.createSubSection = async (req, res) => {
@@ -29,7 +30,8 @@ exports.createSubSection = async (req, res) => {
             title,
             timeDuration: `${videoDetails.duration}`,
             description,
-            videoUrl: videoDetails.secure_url
+            videoUrl: videoDetails.secure_url,
+            cloudinaryPath: videoDetails.public_id
         });
 
         // update Section with sub-section objectId
@@ -154,6 +156,9 @@ exports.deleteSubSection = async (req, res) => {
             },
             { new: true }
         ).populate("subSection").exec();
+
+        // Delete video from cloudinary
+        deleteFileFromCloudinary(subSectionDetails.cloudinaryPath);
 
         // delete sub section
         await SubSection.findByIdAndDelete(subSectionId);
