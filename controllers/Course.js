@@ -5,6 +5,7 @@ const Category = require("../models/Category");
 const User = require("../models/User");
 
 const fileUploader = require("../utils/fileUploader");
+const { convertSecondsToDuration } = require("../utils/secondToDuration");
 
 // createCourse
 exports.createCourse = async (req, res) => {
@@ -241,7 +242,9 @@ exports.getCourseDetails = async (req, res) => {
             .populate({
                 path: "courseContent",
                 populate: {
-                    path: "subSection"
+                    path: "subSection",
+                    // TODO: check whether videoUrl or -videoUrl
+                    select: "-videoUrl"
                 }
             })
             .exec();
@@ -250,14 +253,27 @@ exports.getCourseDetails = async (req, res) => {
         if (!courseDetails) {
             return res.status(400).json({
                 success: false,
-                message: `Could not find course with courseId: ${courseId}`
+                message: `Could not found`
             });
         }
+
+        let totalDurationInSeconds = 0;
+        courseDetails.courseContent.forEach((content) => {
+            content.subSection.forEach((subSection) => {
+                const timeDurationInSeconds = parseInt(subSection.timeDuration);
+                totalDurationInSeconds += timeDurationInSeconds;
+            })
+        });
+
+        const totalDuration = convertSecondsToDuration(totalDurationInSeconds);
 
         return res.status(200).json({
             success: true,
             message: "Course details fetched successfully",
-            data: courseDetails
+            data: {
+                courseDetails,
+                totalDuration
+            }
         });
     } catch (error) {
         return res.status(500).json({
