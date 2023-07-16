@@ -7,7 +7,8 @@ const {
     getCourseDetails,
     editCourse,
     getFullCourseDetails,
-    getInstructorCourses
+    getInstructorCourses,
+    deleteCourse
 } = require("../controllers/Course");
 
 const {
@@ -79,7 +80,10 @@ router.get("/getAllCourses", getAllCourses);
 router.get("/getCourseDetails", getCourseDetails);
 
 // Get details for a specific course with specific user
-router.get("/getFullCourseDetails", auth, getFullCourseDetails)
+router.get("/getFullCourseDetails", auth, getFullCourseDetails);
+
+// Delete a course
+router.delete("/deleteCourse", auth, isInstructor, deleteCourse);
 
 // ********************************************************************************************************
 //                                      Category routes (Only by Admin)
