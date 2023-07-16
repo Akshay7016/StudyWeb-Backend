@@ -4,7 +4,8 @@ const router = express.Router();
 const {
     createCourse,
     getAllCourses,
-    getCourseDetails
+    getCourseDetails,
+    editCourse
 } = require("../controllers/Course");
 
 const {
@@ -44,6 +45,9 @@ const {
 
 // Courses can only be created by Instructors
 router.post("/createCourse", auth, isInstructor, createCourse);
+
+// Edit course details
+router.put("/editCourse", auth, isInstructor, editCourse)
 
 // Add a section to course
 router.post("/addSection", auth, isInstructor, createSection);
