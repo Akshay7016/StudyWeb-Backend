@@ -1,5 +1,6 @@
 const Section = require("../models/Section");
 const Course = require("../models/Course");
+const SubSection = require("../models/SubSection");
 
 // createSection
 exports.createSection = async (req, res) => {
@@ -110,7 +111,7 @@ exports.deleteSection = async (req, res) => {
         if (!sectionDetails) {
             return res.status(404).json({
                 success: false,
-                message: `Could not found section with id ${sectionId}`
+                message: `Section not found`
             });
         };
 
@@ -120,7 +121,7 @@ exports.deleteSection = async (req, res) => {
         if (!courseDetails) {
             return res.status(404).json({
                 success: false,
-                message: `Could not found course with id ${courseId}`
+                message: `Course not found`
             });
         };
 
@@ -134,6 +135,12 @@ exports.deleteSection = async (req, res) => {
             },
             { new: true }
         ).populate("courseContent").exec();
+
+        // Delete sub-sections corresponding to sectionId
+        const subSections = sectionDetails.subSection;
+        for (const subSectionId of subSections) {
+            await SubSection.findByIdAndDelete(subSectionId);
+        };
 
         // delete entry from database
         await Section.findByIdAndDelete(sectionId);
