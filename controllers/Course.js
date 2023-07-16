@@ -196,14 +196,16 @@ exports.editCourse = async (req, res) => {
 // getAllCourses
 exports.getAllCourses = async (req, res) => {
     try {
-        const allCourses = await Course.find({}, {
-            courseName: true,
-            price: true,
-            thumbnail: true,
-            instructor: true,
-            ratingAndReviews: true,
-            studentsEnrolled: true
-        }).populate("instructor").exec();
+        const allCourses = await Course.find(
+            { status: "Published" },
+            {
+                courseName: true,
+                price: true,
+                thumbnail: true,
+                instructor: true,
+                ratingAndReviews: true,
+                studentsEnrolled: true
+            }).populate("instructor").exec();
 
         res.status(200).json({
             success: true,
