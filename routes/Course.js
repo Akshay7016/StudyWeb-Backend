@@ -5,7 +5,8 @@ const {
     createCourse,
     getAllCourses,
     getCourseDetails,
-    editCourse
+    editCourse,
+    getFullCourseDetails
 } = require("../controllers/Course");
 
 const {
@@ -72,6 +73,9 @@ router.get("/getAllCourses", getAllCourses);
 
 // Get detail of specific course
 router.get("/getCourseDetails", getCourseDetails);
+
+// Get details for a specific course with specific user
+router.get("/getFullCourseDetails", auth, getFullCourseDetails)
 
 // ********************************************************************************************************
 //                                      Category routes (Only by Admin)

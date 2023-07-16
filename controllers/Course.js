@@ -3,6 +3,7 @@ require("dotenv").config();
 const Course = require("../models/Course");
 const Category = require("../models/Category");
 const User = require("../models/User");
+const CourseProgress = require("../models/CourseProgress");
 
 const fileUploader = require("../utils/fileUploader");
 const { convertSecondsToDuration } = require("../utils/secondToDuration");
@@ -243,8 +244,6 @@ exports.getCourseDetails = async (req, res) => {
                 path: "courseContent",
                 populate: {
                     path: "subSection",
-                    // TODO: check whether videoUrl or -videoUrl
-                    select: "-videoUrl"
                 }
             })
             .exec();
@@ -253,7 +252,7 @@ exports.getCourseDetails = async (req, res) => {
         if (!courseDetails) {
             return res.status(400).json({
                 success: false,
-                message: `Could not found`
+                message: `Course not found`
             });
         }
 
@@ -279,6 +278,72 @@ exports.getCourseDetails = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Something went wrong while fetching specific course",
+            error: error.message
+        });
+    }
+};
+
+// getFullCourseDetails => for particular user how much he had completed course
+exports.getFullCourseDetails = async (req, res) => {
+    try {
+        const { courseId } = req.body;
+        const userId = req.user.id;
+
+        const courseDetails = await Course.findOne({
+            _id: courseId
+        })
+            .populate({
+                path: "instructor",
+                populate: {
+                    path: "additionalDetails"
+                }
+            })
+            .populate("category")
+            .populate("ratingAndReviews")
+            .populate({
+                path: "courseContent",
+                populate: {
+                    path: "subSection",
+                }
+            })
+            .exec();
+
+        if (!courseDetails) {
+            return res.status(404).json({
+                success: false,
+                message: `Course not find`,
+            })
+        }
+
+        const courseProgressCount = await CourseProgress.findOne({
+            courseID: courseId,
+            userId: userId
+        });
+
+        let totalDurationInSeconds = 0;
+        courseDetails.courseContent.forEach((content) => {
+            content.subSection.forEach((subSection) => {
+                const timeDurationInSeconds = parseInt(subSection.timeDuration);
+                totalDurationInSeconds += timeDurationInSeconds;
+            })
+        });
+
+        const totalDuration = convertSecondsToDuration(totalDurationInSeconds);
+
+        // return response
+        return res.status(200).json({
+            success: true,
+            message: "getFullCourseDetails fetched successfully",
+            data: {
+                courseDetails,
+                totalDuration,
+                completedVideos: courseProgressCount?.completedVideos ? courseProgressCount?.completedVideos : []
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while getting full course details",
             error: error.message
         });
     }
