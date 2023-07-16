@@ -16,13 +16,17 @@ exports.createCourse = async (req, res) => {
             whatYouWillLearn,
             price,
             category,
-            tags,
+            tags: _tags,
             status,
-            instructions
+            instructions: _instructions
         } = req.body;
 
         // get thumbnail
         const thumbnail = req.files.thumbnailImage;
+
+        // Convert the tag and instructions from stringified Array to Array
+        const tags = JSON.parse(_tags)
+        const instructions = JSON.parse(_instructions)
 
         // validation
         if (
@@ -31,8 +35,9 @@ exports.createCourse = async (req, res) => {
             !whatYouWillLearn ||
             !price ||
             !category ||
-            !tags ||
-            !thumbnail
+            !tags.length ||
+            !thumbnail ||
+            !instructions.length
         ) {
             return res.status(400).json({
                 success: false,
@@ -56,7 +61,7 @@ exports.createCourse = async (req, res) => {
             });
         }
 
-        // validation on category -> require for backend testing -> may be get invalid category id from request
+        // Check if the tag given is valid 
         const categoryDetails = await Category.findById({ _id: category });
 
         if (!categoryDetails) {
@@ -79,11 +84,11 @@ exports.createCourse = async (req, res) => {
             category,
             tags,
             thumbnail: thumbnailImage.secure_url,
-            status: status,
-            instructions: instructions,
+            status,
+            instructions,
         });
 
-        // add the newCourse id to the User Schema -> courses field
+        // add the newCourse id to the User Schema of the Instructor
         await User.findByIdAndUpdate(
             { _id: instructorId },
             {
@@ -94,7 +99,7 @@ exports.createCourse = async (req, res) => {
             { new: true }
         );
 
-        // add the newCourse id to the Category Schema -> course field
+        // add the newCourse id to the Categories
         await Category.findByIdAndUpdate(
             { _id: category },
             {
