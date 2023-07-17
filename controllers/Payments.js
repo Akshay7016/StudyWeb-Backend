@@ -10,62 +10,58 @@ const { courseEnrollmentEmail } = require("../mail/templates/courseEnrollmentEma
 exports.capturePayment = async (req, res) => {
     try {
         // get courseId and userID
-        const { courseId } = req.body;
+        const { courses } = req.body;
         const userId = req.user.id;
 
-        // validation
-        if (!courseId) {
+        if (courses.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: "CourseId is required"
-            });
+                message: "Please provide course id"
+            })
         };
 
-        // courseDetail validation
-        const courseDetails = await Course.findById(courseId);
+        let total_amount = 0;
 
-        if (!courseDetails) {
-            return res.status(400).json({
-                success: false,
-                message: `Could not find course with Id: ${courseId}`
-            });
-        };
+        for (const courseId of courses) {
+            // find the course by its id
+            const courseDetails = await Course.findById(courseId);
 
-        // check whether user already enrolled for that course
-        const uid = new mongoose.Types.ObjectId(userId);  // as our userID is in String format, so convert it into ObjectId
+            // If the course is not found, return an error
+            if (!courseDetails) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Could not find course`
+                });
+            };
 
-        if (courseDetails.studentsEnrolled.includes(uid)) {
-            return res.status(403).json({
-                success: false,
-                message: "Student already enrolled into the course"
-            });
-        };
+            // Check if the user is already enrolled in the course
+            const uid = new mongoose.Types.ObjectId(userId);
+            if (courseDetails.studentsEnrolled.includes(uid)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Student is already enrolled"
+                })
+            };
+
+            // Add the price of the course to the total amount
+            total_amount += courseDetails.price;
+        }
 
         // create order
         const options = {
-            amount: courseDetails.price * 100,
+            amount: total_amount * 100,
             currency: "INR",
             receipt: Math.random(Date.now()).toString(),
-            notes: {
-                courseId,
-                userId
-            }
         };
 
         try {
+            // Initiate the payment using Razorpay
             const paymentResponse = await instance.orders.create(options);
 
             return res.status(200).json({
                 success: true,
                 message: "Order created successfully",
-                data: {
-                    courseName: courseDetails.courseName,
-                    courseDescription: courseDetails.courseDescription,
-                    thumbnail: courseDetails.thumbnail,
-                    orderId: paymentResponse.id,
-                    currency: paymentResponse.currency,
-                    amount: paymentResponse.amount
-                }
+                data: paymentResponse
             });
         } catch (error) {
             return res.status(500).json({
