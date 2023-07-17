@@ -36,6 +36,10 @@ const {
 } = require("../controllers/RatingAndReview");
 
 const {
+    updateCourseProgress
+} = require("../controllers/CourseProgress");
+
+const {
     auth,
     isStudent,
     isInstructor,
@@ -81,6 +85,9 @@ router.get("/getCourseDetails", getCourseDetails);
 
 // Get details for a specific course with specific user
 router.get("/getFullCourseDetails", auth, getFullCourseDetails);
+
+// To update course progress
+router.put("/updateCourseProgress", auth, isStudent, updateCourseProgress)
 
 // Delete a course
 router.delete("/deleteCourse", auth, isInstructor, deleteCourse);
