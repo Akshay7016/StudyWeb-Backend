@@ -251,3 +251,42 @@ exports.getEnrolledCourses = async (req, res) => {
         });
     }
 };
+
+// instructorDashboard
+exports.instructorDashboard = async (req, res) => {
+    try {
+        // get instructor id
+        const instructorId = req.user.id;
+
+        const courseDetails = await Course.find({ instructor: instructorId });
+
+        const courseData = courseDetails.map((course) => {
+            const totalStudentsEnrolled = course.studentsEnrolled.length;
+            const totalAmountGenerated = totalStudentsEnrolled * course.price;
+
+            // create a new object with the additional fields
+            const courseDataWithStats = {
+                _id: course._id,
+                courseName: course.courseName,
+                courseDescription: course.courseDescription,
+                totalStudentsEnrolled,
+                totalAmountGenerated
+            }
+
+            return courseDataWithStats;
+        });
+
+        // return response
+        return res.status(200).json({
+            success: true,
+            message: "Instructor stats fetched successfully",
+            data: courseData
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while fetching instructor stats data",
+            error: error.message
+        })
+    };
+}
