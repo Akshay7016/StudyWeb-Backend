@@ -1,8 +1,11 @@
 const mongoose = require("mongoose");
+const crypto = require("crypto");
+require("dotenv").config();
 
 const { instance } = require("../config/razorpay");
 const Course = require("../models/Course");
 const User = require("../models/User");
+const CourseProgress = require("../models/CourseProgress");
 const mailSender = require("../utils/mailSender");
 const { courseEnrollmentEmail } = require("../mail/templates/courseEnrollmentEmail");
 
@@ -79,27 +82,61 @@ exports.capturePayment = async (req, res) => {
     }
 };
 
-// verifySignature
-exports.verifySignature = async (req, res) => {
+// verify the payment
+exports.verifyPayment = async (req, res) => {
+    const razorpay_order_id = req.body?.razorpay_order_id;
+    const razorpay_payment_id = req.body?.razorpay_payment_id;
+    const razorpay_signature = req.body?.razorpay_signature;
+    const courses = req.body?.courses;
 
-    // webhook secret stored at backend
-    const webhookSecret = "12345678";
+    const userId = req.user.id;
 
-    // get webhook secret from Razorpay
-    const signature = req.headers("x-razorpay-signature");
+    if (
+        !razorpay_order_id ||
+        !razorpay_payment_id ||
+        !razorpay_signature ||
+        !courses ||
+        !userId
+    ) {
+        return res.status(404).json({
+            success: false,
+            message: "All fields are required"
+        })
+    };
 
-    // convert BE webhook secret to encrypted form to compare with signature
-    const shasum = crypto.createHmac("sha256", webhookSecret);
-    shasum.update(JSON.stringify(req.body));
-    const digest = shasum.digest("hex");
+    let body = razorpay_order_id + "|" + razorpay_payment_id;
 
-    // now compare signature and digest, if equal then payment is authorized. Then find the course and enroll student in that course
-    if (digest === signature) {
-        // fetch courseId and userId from notes. As this call is coming from Razorpay to Backend, so it does not have any courseId and userId. But we have stored it in notes while order creation.  
-        const { courseId, userId } = req.body.payload.payment.entity.notes;
+    const expectedSignature = crypto
+        .createHmac("sha256", process.env.RAZORPAY_SECRET)
+        .update(body.toString())
+        .digest("hex");
 
+    if (expectedSignature === razorpay_signature) {
+        await enrollStudents(courses, userId, res);
+        return res.status(200).json({
+            success: true,
+            message: "Payment Verified"
+        })
+    };
+
+    return res.status(400).json({
+        success: false,
+        message: "Payment failed"
+    })
+};
+
+// enroll the student in the courses
+const enrollStudents = async (courses, userId, res) => {
+    if (!courses || !userId) {
+        return res.status(400).json({
+            success: false,
+            message: "Please provide courses and user"
+        })
+    };
+
+    for (const courseId of courses) {
         try {
-            // find the course and enroll student in that course
+            // Find the course and enroll the student in it
             const enrolledCourse = await Course.findByIdAndUpdate(
                 courseId,
                 {
@@ -111,50 +148,45 @@ exports.verifySignature = async (req, res) => {
             );
 
             if (!enrolledCourse) {
-                return res.status(500).json({
+                return res.status(400).json({
                     success: false,
                     message: "Course not found"
                 })
             };
 
-            // find the student and add the course into the courses list
+            const courseProgress = await CourseProgress.create({
+                courseID: courseId,
+                userId: userId,
+                completedVideos: []
+            });
+
+            // Find the student and add the course to their list of enrolled courses
             const enrolledStudent = await User.findByIdAndUpdate(
                 userId,
                 {
                     $push: {
-                        courses: courseId
+                        courses: courseId,
+                        courseProgress: courseProgress._id
                     }
                 },
                 { new: true }
             );
 
-            // now send the course enrollment mail to user
+            // Send an email notification to the enrolled student
             await mailSender(
                 enrolledStudent.email,
-                "Congratulations, You are enrolled into new StudyWeb course",
+                `Successfully enrolled into ${enrolledCourse.courseName}`,
                 courseEnrollmentEmail(
                     enrolledCourse.courseName,
                     `${enrolledStudent.firstName} ${enrolledStudent.lastName}`
                 )
-            );
-
-            // return response
-            return res.status(200).json({
-                success: true,
-                message: "Signature verified and course added"
-            })
+            )
         } catch (error) {
             return res.status(500).json({
                 success: false,
-                message: "Something went wrong while enrolling student",
+                message: "Something went wrong while enrolling student into course",
                 error: error.message
-            });
+            })
         }
-    } else {
-        return res.status(400).json({
-            success: false,
-            message: "Payment is not authorized",
-            error: error.message
-        });
     }
-};
+}

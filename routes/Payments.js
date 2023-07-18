@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {
     capturePayment,
-    verifySignature
+    verifyPayment
 } = require("../controllers/Payments");
 
 const {
@@ -15,6 +15,6 @@ const {
 router.post("/capturePayment", auth, isStudent, capturePayment);
 
 // Route for verify signature
-router.post("/verifySignature", verifySignature);
+router.post("/verifyPayment", auth, isStudent, verifyPayment);
 
 module.exports = router;
