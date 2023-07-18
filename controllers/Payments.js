@@ -8,6 +8,7 @@ const User = require("../models/User");
 const CourseProgress = require("../models/CourseProgress");
 const mailSender = require("../utils/mailSender");
 const { courseEnrollmentEmail } = require("../mail/templates/courseEnrollmentEmail");
+const { paymentSuccessEmail } = require("../mail/templates/paymentSuccessEmail");
 
 // capture the payment and initiate the razorpay order
 exports.capturePayment = async (req, res) => {
@@ -190,3 +191,37 @@ const enrollStudents = async (courses, userId, res) => {
         }
     }
 }
+
+// Send payment success email
+exports.sendPaymentSuccessEmail = async (req, res) => {
+    try {
+        const { orderId, paymentId, amount } = req.body;
+        const userId = req.user.id;
+
+        if (!orderId || !paymentId || !amount || !userId) {
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required"
+            })
+        };
+
+        const enrolledStudent = await User.findById(userId);
+
+        await mailSender(
+            enrolledStudent.email,
+            "Payment Received",
+            paymentSuccessEmail(
+                `${enrolledStudent.firstName} ${enrolledStudent.lastName}`,
+                amount / 100,
+                orderId,
+                paymentId
+            )
+        );
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Could not send payment successful email",
+            error: error.message
+        })
+    }
+};
