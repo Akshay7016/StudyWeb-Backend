@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const Profile = require("../models/Profile");
 const User = require("../models/User");
+const Course = require("../models/Course")
 
 const fileUploader = require("../utils/fileUploader");
 
@@ -81,7 +82,19 @@ exports.deleteAccount = async (req, res) => {
         // delete user additionalDetails (Profile)
         await Profile.findByIdAndDelete(userDetails.additionalDetails);
 
-        // TODO: unenroll user from all enrolled courses
+        // unenroll user from all enrolled courses
+        for (const courseId of userDetails.courses) {
+            await Course.findByIdAndUpdate(
+                courseId,
+                {
+                    $pull: {
+                        studentsEnrolled: id
+                    }
+                },
+                { new: true }
+            )
+        };
+
         // TODO: perform request scheduling (use CRON job to delete account after 5 days)
 
         // delete user
