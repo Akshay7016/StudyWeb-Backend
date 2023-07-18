@@ -2,9 +2,11 @@ require("dotenv").config();
 
 const Profile = require("../models/Profile");
 const User = require("../models/User");
-const Course = require("../models/Course")
+const Course = require("../models/Course");
+const CourseProgress = require("../models/CourseProgress");
 
 const fileUploader = require("../utils/fileUploader");
+const { convertSecondsToDuration } = require("../utils/secondToDuration");
 
 // updateProfile
 exports.updateProfile = async (req, res) => {
@@ -184,9 +186,48 @@ exports.getEnrolledCourses = async (req, res) => {
         const userId = req.user.id;
 
         // find enrolled courses
-        const userDetails = await User.findById(userId)
-            .populate("courses")
+        let userDetails = await User.findById(userId)
+            .populate({
+                path: "courses",
+                populate: {
+                    path: "courseContent",
+                    populate: {
+                        path: "subSection"
+                    }
+                }
+            })
             .exec();
+
+        userDetails = userDetails.toObject();
+        let subSectionLength = 0;
+
+        for (let i = 0; i < userDetails.courses.length; i++) {
+            let totalDurationInSeconds = 0;
+            subSectionLength = 0;
+
+            for (let j = 0; j < userDetails.courses[i].courseContent.length; j++) {
+                totalDurationInSeconds += userDetails.courses[i].courseContent[j].subSection.reduce((acc, current) => acc + parseInt(current.timeDuration), 0);
+
+                userDetails.courses[i].totalDuration = convertSecondsToDuration(totalDurationInSeconds);
+
+                subSectionLength += userDetails.courses[i].courseContent[j].subSection.length;
+            }
+
+            let courseProgressCount = await CourseProgress.findOne({
+                courseID: userDetails.courses[i]._id,
+                userId: userId
+            });
+
+            courseProgressCount = courseProgressCount?.completedVideos.length;
+
+            if (subSectionLength === 0) {
+                userDetails.courses[i].progressPercentage = 100
+            } else {
+                // To make it up to 2 decimal points
+                const multiplier = Math.pow(10, 2);
+                userDetails.courses[i].progressPercentage = Math.round((courseProgressCount / subSectionLength) * 100 * multiplier) / multiplier;
+            }
+        };
 
         // validation
         if (!userDetails) {
