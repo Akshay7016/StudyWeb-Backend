@@ -63,10 +63,10 @@ exports.createSection = async (req, res) => {
 exports.updateSection = async (req, res) => {
     try {
         // fetch data
-        const { sectionName, sectionId } = req.body;
+        const { sectionName, sectionId, courseId } = req.body;
 
         // validation
-        if (!sectionName || !sectionId) {
+        if (!sectionName || !sectionId || !courseId) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
@@ -74,13 +74,22 @@ exports.updateSection = async (req, res) => {
         };
 
         // update entry in database
-        const updatedSection = await Section.findByIdAndUpdate(sectionId, { sectionName }, { new: true });
+        await Section.findByIdAndUpdate(sectionId, { sectionName }, { new: true });
+
+        const courseDetails = await Course.findById(courseId)
+            .populate({
+                path: "courseContent",
+                populate: {
+                    path: "subSection"
+                }
+            })
+            .exec();
 
         // return response
         return res.status(200).json({
             success: true,
             message: "Section updated successfully",
-            data: updatedSection
+            data: courseDetails
         });
     } catch (error) {
         return res.status(500).json({
@@ -125,6 +134,15 @@ exports.deleteSection = async (req, res) => {
             });
         };
 
+        // Delete sub-sections corresponding to sectionId
+        const subSections = sectionDetails.subSection;
+        for (const subSectionId of subSections) {
+            await SubSection.findByIdAndDelete(subSectionId);
+        };
+
+        // delete entry from database
+        await Section.findByIdAndDelete(sectionId);
+
         // delete section id from Course schema
         const updatedCourse = await Course.findByIdAndUpdate(
             courseId,
@@ -134,16 +152,14 @@ exports.deleteSection = async (req, res) => {
                 }
             },
             { new: true }
-        ).populate("courseContent").exec();
-
-        // Delete sub-sections corresponding to sectionId
-        const subSections = sectionDetails.subSection;
-        for (const subSectionId of subSections) {
-            await SubSection.findByIdAndDelete(subSectionId);
-        };
-
-        // delete entry from database
-        await Section.findByIdAndDelete(sectionId);
+        )
+            .populate({
+                path: "courseContent",
+                populate: {
+                    path: "subSection"
+                }
+            })
+            .exec();
 
         // return response
         return res.status(200).json({
