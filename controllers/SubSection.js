@@ -3,6 +3,7 @@ require("dotenv").config();
 const SubSection = require("../models/SubSection");
 const Section = require("../models/Section");
 const fileUploader = require("../utils/fileUploader");
+const { deleteFileFromCloudinary } = require("../utils/deleteFileFromCloudinary");
 
 // createSubSection
 exports.createSubSection = async (req, res) => {
@@ -84,6 +85,9 @@ exports.updateSubSection = async (req, res) => {
         if (req.files && req.files.videoFile !== undefined) {
             const video = req.files.videoFile;
             const uploadDetails = await fileUploader(video, process.env.FOLDER_NAME);
+
+            // Delete old video from cloudinary and then update the video
+            await deleteFileFromCloudinary(subSection.cloudinaryPath);
 
             subSection.videoUrl = uploadDetails.secure_url;
             subSection.timeDuration = `${uploadDetails.duration}`;
