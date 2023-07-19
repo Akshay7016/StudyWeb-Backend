@@ -47,7 +47,7 @@ exports.createRatingAndReview = async (req, res) => {
         });
 
         // update the course with this rating and review
-        const updatedCourse = await Course.findByIdAndUpdate(
+        await Course.findByIdAndUpdate(
             courseId,
             {
                 $push: {
@@ -61,7 +61,7 @@ exports.createRatingAndReview = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Rating and review added for course",
-            data: updatedCourse
+            data: ratingAndReview
         });
     } catch (error) {
         return res.status(500).json({
