@@ -62,16 +62,9 @@ exports.createSubSection = async (req, res) => {
 // updateSubSection
 exports.updateSubSection = async (req, res) => {
     try {
-        const { sectionId, title, description } = req.body;
+        const { sectionId, subSectionId, title, description } = req.body;
 
-        if (!sectionId) {
-            return res.status(404).json({
-                success: false,
-                message: "Sub section Id is required"
-            })
-        }
-
-        const subSection = await SubSection.findById(sectionId);
+        const subSection = await SubSection.findById(subSectionId);
 
         if (!subSection) {
             return res.status(404).json({
@@ -93,15 +86,20 @@ exports.updateSubSection = async (req, res) => {
             const uploadDetails = await fileUploader(video, process.env.FOLDER_NAME);
 
             subSection.videoUrl = uploadDetails.secure_url;
-            subSection.timeDuration = `${uploadDetails.duration}`
+            subSection.timeDuration = `${uploadDetails.duration}`;
+            subSection.cloudinaryPath = uploadDetails.public_id;
         }
 
-        const updatedSubSection = await subSection.save();
+        await subSection.save();
 
+        // find updated section and return it
+        const updatedSection = await Section.findById(sectionId).populate("subSection").exec();
+
+        // return response
         return res.status(200).json({
             success: true,
             message: "Sub section details updated successfully",
-            data: updatedSubSection
+            data: updatedSection
         });
     } catch (error) {
         return res.status(500).json({
@@ -131,7 +129,7 @@ exports.deleteSubSection = async (req, res) => {
         if (!sectionDetails) {
             return res.status(404).json({
                 success: false,
-                message: `Could not found section with id ${sectionId}`
+                message: `Section not found`
             });
         };
 
@@ -141,9 +139,12 @@ exports.deleteSubSection = async (req, res) => {
         if (!subSectionDetails) {
             return res.status(404).json({
                 success: false,
-                message: `Could not found sub section with id ${subSectionId}`
+                message: `Sub section not found`
             });
         };
+
+        // delete sub section
+        await SubSection.findByIdAndDelete(subSectionId);
 
         // delete sub section id from section schema
         const updatedSection = await Section.findByIdAndUpdate(
@@ -155,9 +156,6 @@ exports.deleteSubSection = async (req, res) => {
             },
             { new: true }
         ).populate("subSection").exec();
-
-        // delete sub section
-        await SubSection.findByIdAndDelete(subSectionId);
 
         return res.status(200).json({
             success: true,
