@@ -380,6 +380,7 @@ exports.getInstructorCourses = async (req, res) => {
 exports.deleteCourse = async (req, res) => {
     try {
         const { courseId } = req.body;
+        const instructorId = req.user.id;
 
         // Find the course
         const course = await Course.findById(courseId);
@@ -416,6 +417,17 @@ exports.deleteCourse = async (req, res) => {
             // Delete the section
             await Section.findByIdAndDelete(sectionId);
         };
+
+        // Delete courseId from Instructors courses array
+        await User.findByIdAndUpdate(
+            { _id: instructorId },
+            {
+                $pull: {
+                    courses: courseId
+                }
+            },
+            { new: true }
+        );
 
         // Delete the course
         await Course.findByIdAndDelete(courseId);
