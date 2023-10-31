@@ -84,7 +84,7 @@ router.get("/getAllCourses", getAllCourses);
 router.get("/getCourseDetails", getCourseDetails);
 
 // Get details for a specific course with specific user
-router.get("/getFullCourseDetails", auth, getFullCourseDetails);
+router.post("/getFullCourseDetails", auth, getFullCourseDetails);
 
 // To update course progress
 router.put("/updateCourseProgress", auth, isStudent, updateCourseProgress)

@@ -345,7 +345,7 @@ exports.getFullCourseDetails = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Something went wrong while getting full course details",
+            message: "Something went wrong while fetching full course details",
             error: error.message
         });
     }
