@@ -66,7 +66,8 @@ exports.categoryPageDetails = async (req, res) => {
             .populate({
                 path: "courses",
                 match: { status: "Published" },
-                populate: "ratingAndReviews"
+                populate: "ratingAndReviews",
+                populate: "instructor"
             })
             .exec();
 
@@ -92,7 +93,9 @@ exports.categoryPageDetails = async (req, res) => {
             categoriesExceptSelected[getRandomInt(categoriesExceptSelected.length)]._id
         ).populate({
             path: "courses",
-            match: { status: "Published" }
+            match: { status: "Published" },
+            populate: "ratingAndReviews",
+            populate: "instructor"
         }).exec()
 
 
@@ -100,7 +103,9 @@ exports.categoryPageDetails = async (req, res) => {
         const allCategories = await Category.find({})
             .populate({
                 path: "courses",
-                match: { status: "Published" }
+                match: { status: "Published" },
+                populate: "ratingAndReviews",
+                populate: "instructor"
             }).exec();
 
         const allCourses = allCategories.flatMap((category) => category.courses);
