@@ -81,7 +81,7 @@ router.get("/getInstructorCourses", auth, isInstructor, getInstructorCourses);
 router.get("/getAllCourses", getAllCourses);
 
 // Get detail of specific course
-router.get("/getCourseDetails", getCourseDetails);
+router.post("/getCourseDetails", getCourseDetails);
 
 // Get details for a specific course with specific user
 router.post("/getFullCourseDetails", auth, getFullCourseDetails);
