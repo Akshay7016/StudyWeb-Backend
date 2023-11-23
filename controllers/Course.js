@@ -313,7 +313,7 @@ exports.getFullCourseDetails = async (req, res) => {
         if (!courseDetails) {
             return res.status(404).json({
                 success: false,
-                message: `Course not find`,
+                message: `Course not found`,
             })
         }
 
