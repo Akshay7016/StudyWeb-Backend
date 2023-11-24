@@ -21,7 +21,7 @@ exports.createRatingAndReview = async (req, res) => {
         if (!isUserEnrolled) {
             return res.status(404).json({
                 success: false,
-                message: "User is not enrolled into the course"
+                message: "You are not enrolled into the course"
             });
         }
 
@@ -34,7 +34,7 @@ exports.createRatingAndReview = async (req, res) => {
         if (alreadyReviewed) {
             return res.status(403).json({
                 success: false,
-                message: "Course is already reviewed by the user"
+                message: "You have already added Rating and Reviews"
             })
         };
 
@@ -60,7 +60,7 @@ exports.createRatingAndReview = async (req, res) => {
         // return response
         return res.status(200).json({
             success: true,
-            message: "Rating and review added for course",
+            message: "Rating and review added to the course",
             data: ratingAndReview
         });
     } catch (error) {
