@@ -12,7 +12,7 @@ exports.updateCourseProgress = async (req, res) => {
         if (!subSection) {
             return res.status(404).json({
                 success: false,
-                message: "Sub section not found"
+                message: "Lecture not found"
             });
         };
 
@@ -33,7 +33,7 @@ exports.updateCourseProgress = async (req, res) => {
         if (courseProgress?.completedVideos?.includes(subSectionId)) {
             return res.status(400).json({
                 success: false,
-                message: "SubSection already completed"
+                message: "Lecture already completed"
             });
         }
 
@@ -46,7 +46,7 @@ exports.updateCourseProgress = async (req, res) => {
         // return response
         return res.status(200).json({
             success: true,
-            message: "Course progress updated"
+            message: "Lecture completed"
         })
     } catch (error) {
         return res.status(500).json({
