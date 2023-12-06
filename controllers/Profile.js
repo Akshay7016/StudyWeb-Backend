@@ -258,22 +258,22 @@ exports.instructorDashboard = async (req, res) => {
         // get instructor id
         const instructorId = req.user.id;
 
-        const courseDetails = await Course.find({ instructor: instructorId });
+        const courseDetails = await Course.find({ instructor: instructorId }).sort({ createdAt: -1 });;
 
         const courseData = courseDetails.map((course) => {
             const totalStudentsEnrolled = course.studentsEnrolled.length;
             const totalAmountGenerated = totalStudentsEnrolled * course.price;
 
-            // create a new object with the additional fields
-            const courseDataWithStats = {
+            // create a new object with the additional fields and return it
+            return {
                 _id: course._id,
                 courseName: course.courseName,
                 courseDescription: course.courseDescription,
+                thumbnail: course.thumbnail,
+                price: course.price,
                 totalStudentsEnrolled,
                 totalAmountGenerated
-            }
-
-            return courseDataWithStats;
+            };
         });
 
         // return response
