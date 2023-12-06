@@ -359,13 +359,31 @@ exports.getInstructorCourses = async (req, res) => {
         // find all courses belonging to the instructor
         const instructorCourses = await Course.find({
             instructor: instructorId
-        }).sort({ createdAt: -1 });
+        })
+            .populate({
+                path: "courseContent",
+                populate: {
+                    path: "subSection"
+                }
+            })
+            .sort({ createdAt: -1 });
+
+        const courses = instructorCourses.map((course) => course.toObject());
+
+        for (let i = 0; i < courses.length; i++) {
+            let totalDurationInSeconds = 0;
+
+            for (let j = 0; j < courses[i].courseContent.length; j++) {
+                totalDurationInSeconds += courses[i].courseContent[j].subSection.reduce((acc, current) => acc + parseInt(current.timeDuration), 0);
+            }
+            courses[i].totalDuration = convertSecondsToDuration(totalDurationInSeconds);
+        }
 
         // return response
         return res.status(200).json({
             success: true,
             message: "Instructor courses fetched successfully",
-            data: instructorCourses
+            data: courses
         });
     } catch (error) {
         return res.status(500).json({
