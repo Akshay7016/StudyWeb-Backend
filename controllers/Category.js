@@ -81,7 +81,7 @@ exports.categoryPageDetails = async (req, res) => {
         if (selectedCategory.courses.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: "No courses found for the selected category"
+                message: "No courses found"
             })
         }
 
