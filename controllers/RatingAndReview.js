@@ -146,5 +146,3 @@ exports.getAllRatingAndReview = async (req, res) => {
         });
     }
 };
-
-// TODO: write controller get rating and reviews for particular course

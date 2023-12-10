@@ -102,7 +102,6 @@ exports.signUp = async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // FIXME: check why approved use and checking is wrong
         let approved = "";
         approved = approved === "Instructor" ? false : true
 
@@ -125,8 +124,6 @@ exports.signUp = async (req, res) => {
             additionalDetails: profileDetails._id,
             image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`
         });
-
-        // TODO: after successful signup send mail to user
 
         return res.status(200).json({
             success: true,
