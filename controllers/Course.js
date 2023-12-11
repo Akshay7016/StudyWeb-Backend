@@ -447,6 +447,17 @@ exports.deleteCourse = async (req, res) => {
             { new: true }
         );
 
+        // Delete courseId from categories array
+        await Category.findByIdAndUpdate(
+            course?.category,
+            {
+                $pull: {
+                    courses: courseId
+                }
+            },
+            { new: true }
+        );
+
         // Delete the course
         await Course.findByIdAndDelete(courseId);
 
