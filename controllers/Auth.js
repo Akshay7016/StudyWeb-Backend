@@ -33,8 +33,6 @@ exports.sendOTP = async (req, res) => {
             specialChars: false
         });
 
-        console.log("OTP", otp)
-
         // create otp entry in database
         await OTP.create({ email, otp });
 
