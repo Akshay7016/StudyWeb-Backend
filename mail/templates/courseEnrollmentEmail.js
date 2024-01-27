@@ -67,7 +67,7 @@ exports.courseEnrollmentEmail = (courseName, name) => {
     
       <body>
         <div class="container">
-          <a href="https://studynotion-edtech-project.vercel.app"
+          <a href="https://studyweb.vercel.app"
             ><img
               class="logo"
               src="https://res.cloudinary.com/dmwje3sr4/image/upload/v1685078634/StudyWeb%20logo/final_fphd37.png"
@@ -87,7 +87,7 @@ exports.courseEnrollmentEmail = (courseName, name) => {
             </p>
             <a
               class="cta"
-              href="https://studynotion-edtech-project.vercel.app/dashboard"
+              href="https://studyweb.vercel.app/dashboard/enrolled-courses"
               >Go to Dashboard</a
             >
           </div>
