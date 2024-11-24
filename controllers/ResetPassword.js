@@ -1,3 +1,4 @@
+require("dotenv").config();
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 
@@ -40,7 +41,7 @@ exports.resetPasswordToken = async (req, res) => {
         );
 
         // create url
-        const url = `http://localhost:3000/update-password/${token}`;
+        const url = `${process.env.CLIENT_URL}/update-password/${token}`;
 
         // send mail containing the url
         await mailSender(
