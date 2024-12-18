@@ -1,0 +1,592 @@
+{
+	"info": {
+		"_postman_id": "6e9ad407-be95-4c89-a2aa-b017ba440a66",
+		"name": "StudyWeb",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "18316153"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Send OTP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"instructor@test.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_AUTH}}/sendotp"
+					},
+					"response": []
+				},
+				{
+					"name": "Signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"Instructor\",\r\n    \"lastName\":\"Account\",\r\n    \"email\":\"instructor@test.com\",\r\n    \"password\":\"test\",\r\n    \"confirmPassword\":\"test\",\r\n    \"accountType\":\"Instructor\",\r\n    \"otp\":\"888558\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_AUTH}}/signup"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"admin@test.com\",\r\n    \"password\":\"test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_AUTH}}/login"
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"currentPassword\":\"test\",\r\n    \"newPassword\":\"akshay\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_AUTH}}/changePassword"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profile",
+			"item": [
+				{
+					"name": "Update Profile Picture",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "displayPicture",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "displayPicture",
+									"type": "file",
+									"src": "/C:/Users/AANILSAJ/Desktop/download.jfif"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_PROFILE}}/updateDisplayPicture",
+							"host": [
+								"{{BASE_PROFILE}}"
+							],
+							"path": [
+								"updateDisplayPicture"
+							],
+							"query": [
+								{
+									"key": "displayPicture",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Additional Details",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"Akshay\",\r\n    \"lastName\":\"Sajgule\",\r\n    \"contactNumber\":\"9999999999\",\r\n    \"gender\":\"Female\",\r\n    \"about\":\"I am software enginnerr\",\r\n    \"dateOfBirth\":\"17/03/1999\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_PROFILE}}/updateProfile"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_PROFILE}}/getUserDetails"
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"asajgule@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_AUTH}}/reset-password-token"
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"token\": \"95ce1cb94693fc4f348a60dd76d284cca9f1c774\",\r\n    \"password\": \"akshay\",\r\n    \"confirmPassword\": \"akshay\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_AUTH}}/reset-password"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Enrolled courses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_PROFILE}}/getEnrolledCourses"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Account",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": "{{BASE_PROFILE}}/deleteProfile"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Courses",
+			"item": [
+				{
+					"name": "Category",
+					"item": [
+						{
+							"name": "Create Category",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"Music\",\r\n    \"description\":\"Courses related to music\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_COURSE}}/createCategory"
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Categories",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_COURSE}}/getAllCategories"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Section",
+					"item": [
+						{
+							"name": "Create Section",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"sectionName\":\"3. Section 3\",\r\n    \"courseId\":\"64b7c2ba9febdd53b085d832\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_COURSE}}/addSection"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Section",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"sectionId\":\"64b7b3bb27b558b777d3f5e0\",\r\n    \"sectionName\":\"Hello it is my first section\",\r\n    \"courseId\":\"64b7b37827b558b777d3f5db\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_COURSE}}/updateSection"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Section",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"courseId\":\"64b7b37827b558b777d3f5db\",\r\n    \"sectionId\":\"64b7b9049febdd53b085d7e7\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_COURSE}}/deleteSection"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Sub Section",
+					"item": [
+						{
+							"name": "Add Sub Section",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "videoFile",
+											"type": "file",
+											"src": "/C:/Users/AANILSAJ/Desktop/dear.mp4"
+										},
+										{
+											"key": "sectionId",
+											"value": "651ac97dff068a03f096e652",
+											"type": "text"
+										},
+										{
+											"key": "title",
+											"value": "second video",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "video",
+											"type": "text"
+										}
+									]
+								},
+								"url": "{{BASE_COURSE}}/addSubSection"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Sub Section",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "sectionId",
+											"value": "64b7c2d19febdd53b085d837",
+											"type": "text"
+										},
+										{
+											"key": "title",
+											"value": "Deer video",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "Updated game",
+											"type": "text"
+										},
+										{
+											"key": "videoFile",
+											"type": "file",
+											"src": "/C:/Users/AANILSAJ/Desktop/dear.mp4"
+										},
+										{
+											"key": "subSectionId",
+											"value": "64b7c30c9febdd53b085d83b",
+											"type": "text"
+										}
+									]
+								},
+								"url": "{{BASE_COURSE}}/updateSubSection"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Sub Section",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"sectionId\":\"64b7b8e59febdd53b085d7e1\",\r\n    \"subSectionId\":\"64b7b9879febdd53b085d7f2\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_COURSE}}/deleteSubSection"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Create Course",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "thumbnailImage",
+									"type": "file",
+									"src": "/C:/Users/AANILSAJ/Desktop/cartoon.jpg"
+								},
+								{
+									"key": "courseName",
+									"value": "Course 1",
+									"type": "text"
+								},
+								{
+									"key": "courseDescription",
+									"value": "Master Course teaches by akshay",
+									"type": "text"
+								},
+								{
+									"key": "whatYouWillLearn",
+									"value": "Python programming language",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "1200",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "6480614faffbbdbbea053493",
+									"type": "text"
+								},
+								{
+									"key": "tags",
+									"value": "\"AI,ML\"",
+									"type": "text"
+								},
+								{
+									"key": "instructions",
+									"value": "\"Hello,Bye\"",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{BASE_COURSE}}/createCourse"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Courses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_COURSE}}/getAllCourses"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Course By ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"courseId\":\"653fd1e9a5402b8b58d03ff0\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_COURSE}}/getCourseDetails"
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Course",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "courseId",
+									"value": "64e5e5b1cefed273c0a588b9",
+									"type": "text"
+								},
+								{
+									"key": "courseName",
+									"value": "Learn Programming with Akshay",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "thumbnailImage",
+									"type": "file",
+									"src": "/C:/Users/AANILSAJ/Desktop/final.png"
+								},
+								{
+									"key": "price",
+									"value": "999",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "tags",
+									"value": "\"AI,ML,Data Science\"",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "courseDescription",
+									"value": "Very good akshay",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": "{{BASE_COURSE}}/editCourse"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Instructor Courses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_COURSE}}/getInstructorCourses"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Course",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"courseId\":\"64b7b37827b558b777d3f5db\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_COURSE}}/deleteCourse"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Contact",
+			"item": [
+				{
+					"name": "contactUs",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"Akshay\",\r\n    \"lastName\":\"Sajgule\",\r\n    \"email\":\"asajgule@gmail.com\",\r\n    \"countryCode\":\"+91\",\r\n    \"phoneNumber\":\"7040607016\",\r\n    \"message\":\"Hello first question\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_CONTACT}}/contact"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
